@@ -1,0 +1,21 @@
+[package]
+# This module will take any embedded_hal class as argument 
+# and an closure for saving it for instance print it on an
+# uart.
+# For a running driver snooping and collecting real protocol
+# data is useful for creating unit tests and live documentation
+# comments
+name = "embedded-hal-spy"
+version = "0.1.0"
+authors = ["Fredrik Simonsson <simson@thesimson.net>"]
+edition = "2018"
+
+[dependencies]
+nb = "0.1.1"
+
+[dependencies.embedded-hal]
+features = ["unproven"]
+version = "0.2"
+
+[lib]
+name = "embedded_hal_spy"

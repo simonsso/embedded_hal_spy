@@ -6,12 +6,14 @@
 # data is useful for creating unit tests and live documentation
 # comments
 name = "embedded-hal-spy"
-version = "0.0.1"
+version = "0.0.2"
 authors = ["Fredrik Simonsson <simson@thesimson.net>"]
 description = "An embedded_hal device hooking on another embedded_hal implementation, retriving data from function calls and responses"
-documentation = "https://docs.rs/embedded-hal"
-keywords = ["hal"]
+documentation = "https://docs.rs/embedded-hal-spy"
+keywords = ["hal","spi"]
 license = "Apache-2.0"
+readme = "README.md"
+repository = "https://github.com/simonsso/embedded_hal_spy"
 edition = "2018"
 
 [dependencies]

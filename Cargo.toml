@@ -6,7 +6,7 @@
 # data is useful for creating unit tests and live documentation
 # comments
 name = "embedded-hal-spy"
-version = "0.0.2"
+version = "0.0.3"
 authors = ["Fredrik Simonsson <simson@thesimson.net>"]
 description = "An embedded_hal device hooking on another embedded_hal implementation, retriving data from function calls and responses"
 documentation = "https://docs.rs/embedded-hal-spy"

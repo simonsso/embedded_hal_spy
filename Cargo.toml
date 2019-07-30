@@ -19,6 +19,9 @@ edition = "2018"
 [dependencies]
 nb = "0.1.1"
 
+[dev-dependencies]
+linux-embedded-hal = "0.2.2"
+
 [dependencies.embedded-hal]
 features = ["unproven"]
 version = "0.2"

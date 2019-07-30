@@ -9,7 +9,38 @@ use core::cell::RefCell;
 /// test case.
 /// 
 
-
+/// Blocking SPI API
+/// hal::blocking::spi::Transfer will return
+/// DataWord::First at start of transfer, all data sent in DataWord::Byte(u8)
+/// DataWord::Response to indicate where transmit ends and response begins
+/// all recived bytes in DataWord::Byte(u8) ending with DataWord::Last
+/// 
+/// Usage:
+/// ```
+///    extern crate embedded_hal_spy;
+///    use embedded_hal_spy::DataWord;
+/// #   use linux_embedded_hal::Spidev;
+/// #   use linux_embedded_hal::Pin;
+/// 
+/// #   if let Ok(spi) = Spidev::open("/dev/spidev0.0"){
+///    let mut spix = embedded_hal_spy::new(spi,
+///             |w|{
+///                 match w {
+///                     DataWord::First => {
+///                         print!("data = ["); 
+///                     },
+///                     DataWord::Last =>  {println!("],"); },
+///                     DataWord::Response =>  { print!("],\r\n       ["); },
+///
+///                     DataWord::Byte(num) => {
+///                         print!("{:x},",num);
+///                         },
+///                     _other => {},
+///                 }
+///             }
+///      );
+/// #     }
+/// ```
 pub struct Spy<T,F>
 where F:Fn(DataWord)
 {
@@ -71,32 +102,7 @@ where T:FullDuplex<u8>,
         s.send(w)
     }
 }
-/// Blocking SPI API
-/// hal::blocking::spi::Transfer will return
-/// DataWord::First at start of transfer, all data sent in DataWord::Byte(u8)
-/// DataWord::Response to indicate where transmit ends and response begins
-/// all recived bytes in DataWord::Byte(u8) ending with DataWord::Last
-/// 
-/// Usage:
-/// ```
-///    let mut spix = embedded_hal_spy::new(spix,
-///             |w|{
-///                 let mut tx = sharetx.borrow_mut();
-///                 match w {
-///                     DataWord::First => {
-///                         print!("data = ["); 
-///                     },
-///                     DataWord::Last =>  {println!("],"); },
-///                     DataWord::Response =>  { print! (b"],\r\n       ["); },
-///
-///                     DataWord::Byte(num) => {
-///                         print!("{:x},",num);
-///                         },
-///                     _other => {},
-///                 }
-///             }
-///         );
-/// ```
+
 impl<T,F> hal::blocking::spi::Transfer<u8> for Spy<T,F>
 where T: hal::blocking::spi::Transfer<u8>,
       F:Fn(DataWord)

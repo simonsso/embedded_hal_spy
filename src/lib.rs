@@ -141,62 +141,65 @@ where T: hal::blocking::spi::Write<u8>,
 }
  
 /// Digital InputPin
-impl<T,F> hal::digital::InputPin for Spy<T,F>
-where T: hal::digital::InputPin,
+impl<T,F> hal::digital::v2::InputPin for Spy<T,F>
+where T: hal::digital::v2::InputPin,
       F: Fn(DataWord)
  {
-    fn is_high(&self) -> bool{
-        let state = (self.s.borrow_mut()).is_high();
-        
+    type Error = T::Error;
+    fn is_high(&self) -> Result<bool,Self::Error>{
+        let state = (self.s.borrow_mut()).is_high()?;
         (self.f.borrow_mut())(DataWord::Byte(state as u8));
-        state
+        Ok(state)
     }
-    fn is_low(&self) -> bool{
-        let state = (self.s.borrow_mut()).is_low();
+    fn is_low(&self) -> Result<bool,Self::Error>{
+        let state = (self.s.borrow_mut()).is_low()?;
         (self.f.borrow_mut())(DataWord::Byte((!state) as u8));
-        state
+        Ok(state)
     }
 }
 
 /// Digital OutputPin
-impl<T,F> hal::digital::OutputPin for Spy<T,F>
-where T: hal::digital::OutputPin,
+impl<T,F> hal::digital::v2::OutputPin for Spy<T,F>
+where T: hal::digital::v2::OutputPin,
       F: Fn(DataWord)
  {
-    fn set_high(&mut self){
+    type Error = T::Error;
+    fn set_high(&mut self)->Result<(),T::Error>{
         (self.f.borrow_mut())(DataWord::Byte(1));
         (self.s.borrow_mut()).set_high()
     }
-    fn set_low(&mut self){
+    fn set_low(&mut self)->Result<(),T::Error>{
         (self.f.borrow_mut())(DataWord::Byte(0));
         (self.s.borrow_mut()).set_low()
     }
 }
 
-impl<T,F> hal::digital::ToggleableOutputPin for Spy<T,F>
-where T: hal::digital::ToggleableOutputPin,
+impl<T,F> hal::digital::v2::ToggleableOutputPin for Spy<T,F>
+where T: hal::digital::v2::ToggleableOutputPin,
       F: Fn(DataWord)
  {
-    fn toggle(&mut self){
+    type Error = T::Error;
+    fn toggle(&mut self)->Result<(),T::Error>{
         (self.f.borrow_mut())(DataWord::Toggle);
         (self.s.borrow_mut()).toggle()
     }
 }
 
 
-impl<T,F> hal::digital::StatefulOutputPin for Spy<T,F>
-where T: hal::digital::StatefulOutputPin,
+impl<T,F> hal::digital::v2::StatefulOutputPin for Spy<T,F>
+where T: hal::digital::v2::StatefulOutputPin,
       F: Fn(DataWord)
 {
-    fn is_set_high(&self) -> bool{
-        let state = (self.s.borrow_mut()).is_set_high();
+    //type Error = T::Error;
+    fn is_set_high(&self) -> Result<bool,T::Error>{
+        let state = (self.s.borrow_mut()).is_set_high()?;
         
         (self.f.borrow_mut())(DataWord::Byte(state as u8));
-        state
+        Ok(state)
     }
-    fn is_set_low(&self) -> bool{
-        let state = (self.s.borrow_mut()).is_set_low();
+    fn is_set_low(&self) -> Result<bool,T::Error>{
+        let state = (self.s.borrow_mut()).is_set_low()?;
         (self.f.borrow_mut())(DataWord::Byte((!state) as u8));
-        state
+        Ok(state)
     }
 }

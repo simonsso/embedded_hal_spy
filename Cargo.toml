@@ -24,7 +24,10 @@ linux-embedded-hal = "0.2.2"
 
 [dependencies.embedded-hal]
 features = ["unproven"]
-version = "0.2"
+version = "0.2.3"
 
 [lib]
 name = "embedded_hal_spy"
+
+[features]
+embedded_hal_digital_io_legacy_v1 = []

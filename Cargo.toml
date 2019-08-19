@@ -6,7 +6,7 @@
 # data is useful for creating unit tests and live documentation
 # comments
 name = "embedded-hal-spy"
-version = "0.0.4"
+version = "0.0.5"
 authors = ["Fredrik Simonsson <simson@thesimson.net>"]
 description = "An embedded_hal device hooking on another embedded_hal implementation, retriving data from function calls and responses"
 documentation = "https://docs.rs/embedded-hal-spy"
@@ -24,7 +24,10 @@ linux-embedded-hal = "0.2.2"
 
 [dependencies.embedded-hal]
 features = ["unproven"]
-version = "0.2"
+version = "0.2.3"
 
 [lib]
 name = "embedded_hal_spy"
+
+[features]
+embedded_hal_digital_io_legacy_v1 = []

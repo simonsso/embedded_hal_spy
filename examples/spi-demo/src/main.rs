@@ -16,9 +16,10 @@ use embedded_hal::digital::OutputPin;
 use nrf52832_hal::gpio;
 use nrf52832_hal::gpio::p0::*;
 use nrf52832_hal::gpio::Level;
-use nrf52832_hal::gpio::*;
+use nrf52832_hal::gpio::p0;
 use nrf52832_hal::spim::Spim;
 use core::cell::RefCell;
+use nrf52832_hal::gpio::PushPull;
 
 extern crate alloc;
 use alloc::vec::Vec;
@@ -43,6 +44,9 @@ fn main() -> ! {
     let cs: P0_21<gpio::Output<PushPull>> = port0.p0_21.into_push_pull_output(Level::Low);
 
     let mut led1: P0_17<gpio::Output<PushPull>> = port0.p0_17.into_push_pull_output(Level::High);
+    let mut led2: P0_18<gpio::Output<PushPull>> = port0.p0_18.into_push_pull_output(Level::High);
+    let mut led3: P0_19<gpio::Output<PushPull>> = port0.p0_19.into_push_pull_output(Level::High);
+    let mut led4: P0_20<gpio::Output<PushPull>> = port0.p0_20.into_push_pull_output(Level::High);
 
     let spiclk = port0.p0_24.into_push_pull_output(Level::Low).degrade();
     let spimosi = port0.p0_23.into_push_pull_output(Level::Low).degrade();
@@ -135,7 +139,6 @@ fn main() -> ! {
         Ok(_) => {}
         Err(_) => {
             tests_ok = false;
-            led2.set_low()
         }
     }
 
@@ -145,18 +148,17 @@ fn main() -> ! {
             for i in 0..test_vec2.len() {
                 if test_vec2[i] != reference_data[i] {
                     tests_ok = false;
-                    led3.set_low();
                 }
             }
         }
         Err(_) => {
             tests_ok = false;
-            led4.set_low();
         }
     }
 
     let eh_spi = 0;
     let mut snoop = snoop.get_mut();
+    led1.set_high();
 
     if tests_ok {
         led1.set_low();

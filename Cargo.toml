@@ -15,6 +15,11 @@ license = "Apache-2.0"
 readme = "README.md"
 repository = "https://github.com/simonsso/embedded_hal_spy"
 edition = "2018"
+[workspace]
+members = [
+  "examples/spi-demo",
+]
+
 
 [dependencies]
 nb = "0.1.1"

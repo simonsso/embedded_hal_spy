@@ -1,8 +1,8 @@
 #![no_std]
 #![no_main]
-// #![feature(alloc)]
-// #![feature(global_allocator)]
 #![feature(lang_items)]
+#![feature(alloc)]
+#![feature(global_allocator)]
 extern crate cortex_m_rt as rt; // v0.5.x
 
 extern crate embedded_hal_spy;
@@ -10,16 +10,15 @@ extern crate nrf52832_hal;
 extern crate panic_halt;
 use embedded_hal::blocking::spi::*;
 
-
+use core::cell::RefCell;
 use cortex_m_rt::entry;
 use embedded_hal::digital::OutputPin;
 use nrf52832_hal::gpio;
+use nrf52832_hal::gpio::p0;
 use nrf52832_hal::gpio::p0::*;
 use nrf52832_hal::gpio::Level;
-use nrf52832_hal::gpio::p0;
-use nrf52832_hal::spim::Spim;
-use core::cell::RefCell;
 use nrf52832_hal::gpio::PushPull;
+use nrf52832_hal::spim::Spim;
 
 extern crate alloc;
 use alloc::vec::Vec;
@@ -36,10 +35,9 @@ static ALLOCATOR: CortexMHeap = CortexMHeap::empty();
 /// one or more Led will remain off.
 #[entry]
 fn main() -> ! {
-
     unsafe { ALLOCATOR.init(cortex_m_rt::heap_start() as usize, 4096 as usize) }
     let p = nrf52832_hal::nrf52832_pac::Peripherals::take().unwrap();
-    let port0 = p0::Parts::new(p.P0);
+    let port0 = p.P0.split();
 
     let cs: P0_21<gpio::Output<PushPull>> = port0.p0_21.into_push_pull_output(Level::Low);
 
@@ -104,27 +102,29 @@ fn main() -> ! {
     let mut snoop = RefCell::new(Vec::<u8>::with_capacity(128));
     let mut ledsnoop = RefCell::new(Vec::<u8>::with_capacity(128));
 
-    let mut eh_spi = embedded_hal_spy::new(spi, |x| {
-        match x {
-            embedded_hal_spy::DataWord::Byte(b) => {
-                    &snoop.borrow_mut().push(b);
-            }
-            embedded_hal_spy::DataWord::First =>{
-                   b"NEW:".into_iter().for_each(|b|{&snoop.borrow_mut().push(b+0);});
-            }
-            embedded_hal_spy::DataWord::Last =>{
-                   b":XXX".into_iter().for_each(|b|{&snoop.borrow_mut().push(b+0);});
-            }
-            _ =>{;}
+    let mut eh_spi = embedded_hal_spy::new(spi, |x| match x {
+        embedded_hal_spy::DataWord::Byte(b) => {
+            &snoop.borrow_mut().push(b);
         }
+        embedded_hal_spy::DataWord::First => {
+            b"NEW:".into_iter().for_each(|b| {
+                &snoop.borrow_mut().push(b + 0);
+            });
+        }
+        embedded_hal_spy::DataWord::Last => {
+            b":XXX".into_iter().for_each(|b| {
+                &snoop.borrow_mut().push(b + 0);
+            });
+        }
+        _ => {}
     });
 
-    let mut led1 = embedded_hal_spy::new(led1, |x| {
-        match x {
-            embedded_hal_spy::DataWord::Byte(b) => {
-                    &ledsnoop.borrow_mut().push(b | 0xf0);
-            }
-            _ =>{ &ledsnoop.borrow_mut().push(0x58);}
+    let mut led1 = embedded_hal_spy::new(led1, |x| match x {
+        embedded_hal_spy::DataWord::Byte(b) => {
+            &ledsnoop.borrow_mut().push(b | 0xf0);
+        }
+        _ => {
+            &ledsnoop.borrow_mut().push(0x58);
         }
     });
     // Toggle with led to generate some trafic
@@ -172,7 +172,6 @@ fn main() -> ! {
 #[no_mangle]
 
 pub fn rust_oom(_layout: Layout) -> ! {
-   // trap here for the debuger to find
-   loop {
-   }
+    // trap here for the debuger to find
+    loop {}
 }

@@ -1,4 +1,4 @@
-# embedded-hal-spy
+# Embedded hal spy
 Implemenets rust embedded_hal for embedded_hal
 
 embedded hal spy implemnets call backs for used traits
